@@ -1,0 +1,15 @@
+int readPin = A0;
+int readVal;
+float Capacitor_Voltage = 0;
+int delayTime = 500;
+void setup() {
+  pinMode(readPin, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  readVal = analogRead(readPin);
+  Capacitor_Voltage = float((5.0/1023.0)*readVal);
+  Serial.println(Capacitor_Voltage);
+  delay(delayTime);
+}
