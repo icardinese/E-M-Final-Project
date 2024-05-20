@@ -1,0 +1,19 @@
+import matplotlib.pyplot as plt
+import csv
+\\downloading the libraries
+
+X = [] \\declaring variable 1 to store the data on the X-axis
+Y = [] \\declaring variable 2 to store the data on the Y-axis
+
+with open('filename.txt', 'r') as datafile:
+    plotting = csv.reader(datafile, delimiter = ',')
+
+    for ROWS in plotting:
+        X.append(int(ROWS[0])) \\adding the data to the array
+        Y.append(int(ROWS[1])) \\adding the data to the array
+
+plt.plot(X, Y) \\plotting the data
+plt.title('Voltage across Capacitor') \\the title of the graph
+plt.xlabel('X') \\X-axis label
+plt.ylabel('Y') \\Y-axis label
+plt.show() \\display the graph
