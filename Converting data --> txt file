@@ -1,0 +1,6 @@
+Use CoolTerm.Exe under "CoolTermWin64Bit".
+Configure the settings and select the correct serial port number.
+Then go under connection --> Capture to text/binary file --> press Start
+Save the file into a name that makes sense!! (This file name has to match with the code in python)
+Press Connect and then start the code in Arduino. After you got enough data press disconnect
+Now that the data is saved onto the file it must now be coded in python for it to be effectively displayed. 
