@@ -1,0 +1,22 @@
+int before_capacitor = A0;
+int after_capacitor = A1;
+int beforeVal;
+int afterVal;
+int capacitorVal;
+float Capacitor_Voltage = 0;
+int delayTime = 500;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(before_capacitor, INPUT);
+  pinMode(after_capacitor, INPUT);
+}
+
+void loop() {
+  beforeVal = analogRead(before_capacitor);
+  afterVal = analogRead(after_capacitor);
+  capacitorVal = afterVal - beforeVal
+  Capacitor_Voltage = float((5.0/1023.0)*capacitorVal);
+  Serial.println(Capacitor_Voltage);
+  delay(delayTime);
+}
