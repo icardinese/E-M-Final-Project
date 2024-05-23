@@ -4,7 +4,7 @@ int beforeVal;
 int afterVal;
 int capacitorVal;
 float Capacitor_Voltage = 0;
-int delayTime = 500;
+int delayTime = 100;
 
 void setup() {
   Serial.begin(9600);
