@@ -1,23 +1,51 @@
-\\Step 1: Download the libraries
-import matplotlib.pyplot as plt
 import csv
+import serial
+import matplotlib.pyplot as plt
 
+Data = serial.Serial(
+  port='COM4',
+  baudrate=9600,
+  parity=serial.PARITY_NONE,
+  stopbits=serial.STOPBITS_ONE,
+  bytesize=serial.EIGHTBITS,
+  timeout=1
+)
 
-\\Step 2: Store the data from the txt file
-X = [] \\declaring variable 1 to store the data on the X-axis
-Y = [] \\declaring variable 2 to store the data on the Y-axis
+n = 0
+m = 0
+m_s = 0
+x_data = []
+x_data2 = []
+y_data = []
+y_data2 = []
+z = 1200
+Timelength = 120
+C = 1
+while n < z:
+    Voltage_data = Data.readline()
 
-with open('filename.txt', 'r') as datafile:
-    plotting = csv.reader(datafile, delimiter = ',')
+    # Decode and convert to float
+    try:
+        decoded_data = Voltage_data.decode().strip()  # Strip removes any extra newlines or spaces
+        voltage = float(decoded_data)
 
-    for ROWS in plotting:
-        X.append(int(ROWS[0])) \\adding the data to the array
-        Y.append(int(ROWS[1])) \\adding the data to the array
-
-
-\\Step 3: Graph the data through the matlib library
-plt.plot(X, Y) \\plotting the data
-plt.title('Voltage across Capacitor') \\the title of the graph
-plt.xlabel('X') \\X-axis label
-plt.ylabel('Y') \\Y-axis label
-plt.show() \\display the graph
+        x_data.append(n/10.0)
+        y_data.append(voltage)
+        
+        n += 1
+    except (UnicodeDecodeError, ValueError) as e:
+        print(f"Error decoding/processing data: {e}")
+while m < z/(50*Timelength/z):
+    
+    x_data2.append(m*5)
+    y_data.append(C*(y_data[m_s+50] - y_data[m_s])/5)
+    
+    m += 1
+    m_s += 50
+plt.plot(x_data, y_data)
+plt.ylabel("Voltage across Capacitor")
+plt.xlabel("Time")
+plt.plot(x_data2,y_data2)
+plt.ylabel("Current")
+plt.xlabel("Time")
+plt.show()
