@@ -15,7 +15,7 @@ void setup() {
 void loop() {
   beforeVal = analogRead(before_capacitor);
   afterVal = analogRead(after_capacitor);
-  capacitorVal = afterVal - beforeVal
+  capacitorVal = afterVal - beforeVal;
   Capacitor_Voltage = float((5.0/1023.0)*capacitorVal);
   Serial.println(Capacitor_Voltage);
   delay(delayTime);
