@@ -13,7 +13,8 @@ Data = serial.Serial(
 
 n = 0
 m = 0
-m_s = 0
+m_s = 49
+m_d = 0
 x_data = []
 x_data2 = []
 y_data = []
@@ -35,17 +36,23 @@ while n < z:
         n += 1
     except (UnicodeDecodeError, ValueError) as e:
         print(f"Error decoding/processing data: {e}")
-while m < z/(50*Timelength/z):
-    
+while m < (Timelength/5.0)-1:
     x_data2.append(m*5)
-    y_data.append(C*(y_data[m_s+50] - y_data[m_s])/5)
-    
+    y_data2.append(C*(y_data[m_s] - y_data[m_d])/5)
     m += 1
+    m_d += 50
     m_s += 50
+
+plt.subplot(121)
 plt.plot(x_data, y_data)
 plt.ylabel("Voltage across Capacitor")
 plt.xlabel("Time")
-plt.plot(x_data2,y_data2)
+
+plt.subplot(122)
+plt.plot(x_data2, y_data2)
 plt.ylabel("Current")
 plt.xlabel("Time")
+
+plt.tight_layout()
+
 plt.show()
