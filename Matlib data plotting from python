@@ -1,6 +1,9 @@
 import csv
+from itertools import count
+import pandas as pd
 import serial
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 Data = serial.Serial(
   port='COM4',
@@ -13,14 +16,15 @@ Data = serial.Serial(
 
 n = 0
 m = 0
-m_s = 49
+Current_Timedelay = 0.5 #delay in seconds for time collection
+m_s = int(Current_Timedelay*10.0 - 1.0)
 m_d = 0
 x_data = []
 x_data2 = []
 y_data = []
 y_data2 = []
-z = 1200
-Timelength = 120
+z = 200
+Timelength = 20
 C = 1
 while n < z:
     Voltage_data = Data.readline()
@@ -36,22 +40,22 @@ while n < z:
         n += 1
     except (UnicodeDecodeError, ValueError) as e:
         print(f"Error decoding/processing data: {e}")
-while m < (Timelength/5.0)-1:
-    x_data2.append(m*5)
+while m < (Timelength/Current_Timedelay)-1:
+    x_data2.append(m*Current_Timedelay)
     y_data2.append(C*(y_data[m_s] - y_data[m_d])/5)
     m += 1
-    m_d += 50
-    m_s += 50
+    m_d += int(Current_Timedelay*10.0)
+    m_s += int(Current_Timedelay*10.0)
 
 plt.subplot(121)
 plt.plot(x_data, y_data)
-plt.ylabel("Voltage across Capacitor")
-plt.xlabel("Time")
+plt.ylabel("Voltage across Capacitor (V)")
+plt.xlabel("Time (s)")
 
 plt.subplot(122)
 plt.plot(x_data2, y_data2)
-plt.ylabel("Current")
-plt.xlabel("Time")
+plt.ylabel("Current (A)")
+plt.xlabel("Time (s)")
 
 plt.tight_layout()
 
