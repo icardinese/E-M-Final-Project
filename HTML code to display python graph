@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-Time Voltage Data</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        #chart {
+            width: 80%;
+            max-width: 800px;
+        }
+        button {
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real-Time Voltage Data</h1>
+    <button id="startButton">Start Data Collection</button>
+    <div id="chart"></div>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            console.log('WebSocket connected!');
+        });
+
+        document.getElementById('startButton').addEventListener('click', function() {
+            console.log('Start button clicked');
+            // Clear previous data
+            trace.x = [];
+            trace.y = [];
+            Plotly.react('chart', data, layout);  // Update the plot with cleared data
+            socket.emit('start_data');
+        });
+
+        var trace = {
+            x: [],
+            y: [],
+            mode: 'lines',
+            line: { color: '#80CAF6' }
+        };
+
+        var data = [trace];
+
+        var layout = {
+            title: 'Real-Time Voltage Data',
+            xaxis: {
+                title: 'Time (s)',
+                range: [0, 10]
+            },
+            yaxis: {
+                title: 'Voltage (V)',
+                range: [0, 5]
+            }
+        };
+
+        Plotly.newPlot('chart', data, layout);
+
+        socket.on('new_data', function(msg) {
+            console.log('Received new data:', msg);
+            if (msg && msg.x !== undefined && msg.y !== undefined) {
+                console.log('Appending data to trace:', msg);
+                trace.x.push(msg.x);
+                trace.y.push(msg.y);
+
+                Plotly.update('chart', {
+                    x: [trace.x],
+                    y: [trace.y]
+                }, [0]);
+
+                var update = {
+                    'xaxis.range': [Math.max(0, msg.x - 10), msg.x]
+                };
+
+                Plotly.relayout('chart', update);
+            } else {
+                console.error('Invalid data:', msg);
+            }
+        });
+
+        socket.on('disconnect', function() {
+            console.log('WebSocket disconnected!');
+        });
+    </script>
+</body>
+</html>
