@@ -1,0 +1,59 @@
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
+import serial
+import logging
+import time
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app, async_mode='eventlet')
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+
+def read_data():
+    app.logger.info("Starting data collection from serial port.")
+    Data = serial.Serial(
+        port='COM4',
+        baudrate=9600,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS,
+        timeout=1
+    )
+    n = 0
+    z = 400
+
+    while n < z:
+        Voltage_data = Data.readline()
+        app.logger.debug(f"Read data: {Voltage_data}")
+
+        # Decode and convert to float
+        try:
+            decoded_data = Voltage_data.decode().strip()  # Strip removes any extra newlines or spaces
+            voltage = float(decoded_data)
+            app.logger.debug(f"Decoded data: {voltage}")
+
+            # Emit data to client
+            socketio.emit('new_data', {'x': n / 10.0, 'y': voltage})
+            app.logger.debug(f"Emitted data: x={n / 10.0}, y={voltage}")
+
+            n += 1
+
+            # Simulate real-time delay
+            time.sleep(0.1)
+
+        except (UnicodeDecodeError, ValueError) as e:
+            app.logger.error(f"Error decoding/processing data: {e}")
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@socketio.on('start_data')
+def handle_start_data():
+    app.logger.info("Received start data command from client.")
+    socketio.start_background_task(read_data)
+
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0', port=5002, debug=True)
